@@ -81,3 +81,24 @@ class MR_JWT {
         return base64_decode(strtr($data, '-_', '+/'));
     }
 }
+function msr_send_jwt_to_main_site() {
+    $jwt = MR_JWT::build_site_jwt();
+    $response = wp_remote_post('https://web-coffee.ir/wp-json/msr/v1/jwt/resiver', [
+        'method'  => 'POST',
+        'headers' => [
+            'Authorization' => 'Bearer ' . $jwt,
+            'Content-Type'  => 'application/json'
+        ],
+        'body'    => json_encode([
+            'site_name' => get_bloginfo('name'),
+            'site_url'  => get_site_url()
+        ]),
+        'timeout' => 10
+    ]);
+
+    if (is_wp_error($response)) {
+        error_log('[MSR] JWT ارسال نشد: ' . $response->get_error_message());
+    } else {
+        error_log('[MSR] JWT با موفقیت ارسال شد.');
+    }
+}

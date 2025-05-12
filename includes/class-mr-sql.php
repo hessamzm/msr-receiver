@@ -1,7 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
-// ساخت جدول در زمان فعال‌سازی
-register_activation_hook(__FILE__, 'msr_create_database_table');
+// ایجاد جدول هنگام استارت افزونه
 function msr_create_database_table() {
     global $wpdb;
 

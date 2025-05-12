@@ -28,17 +28,23 @@ function msr_render_settings_page() {
         echo '<div class="notice notice-success"><p>تنظیمات ذخیره شد.</p></div>';
     }
 
-    // ارسال مجدد JWT
-    if (isset($_POST['resend_jwt'])) {
-        $jwt = MR_JWT::build_site_jwt();
-        $response = wp_remote_post('https://web-coffee.ir/msr/jwt/resiver', [
-            'headers' => ['Authorization' => 'Bearer ' . $jwt],
-            'body'    => json_encode(['site_url' => get_site_url()]),
-        ]);
+// ارسال مجدد JWT
+if (isset($_POST['resend_jwt'])) {
+    $jwt = MR_JWT::build_site_jwt();
+    $response = wp_remote_post('https://web-coffee.ir/wp-json/msr/v1/jwt/resiver', [
+        'method'  => 'POST',
+        'headers' => [
+            'Authorization' => 'Bearer ' . $jwt,
+            'Content-Type'  => 'application/json'
+        ],
+        'body'    => json_encode([
+            'site_name' => get_bloginfo('name'),
+            'site_url'  => get_site_url()
+        ]),
+    ]);
 
-        echo '<div class="notice notice-info"><p>JWT مجدداً ارسال شد.</p></div>';
-    }
-
+    echo '<div class="notice notice-info"><p>JWT مجدداً ارسال شد.</p></div>';
+}
     $users = get_users(['fields' => ['ID', 'display_name']]);
     $current = get_option('msr_default_author_id', 1);
 

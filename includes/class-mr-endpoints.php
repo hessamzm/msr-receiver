@@ -178,6 +178,12 @@ public static function update_seo($request) {
     MR_Handler::add_log($post_id, 'اطلاعات سئو ثبت شد');
     MR_Handler::update_status($post_id, 'complete');
 
+      // انتشار پست پس از کامل شدن همه مراحل
+    wp_update_post([
+        'ID' => $post_id,
+        'post_status' => 'publish'
+    ]);
+
     return ['message' => 'اطلاعات سئو ثبت شد و وضعیت به complete تغییر یافت'];
 }
 
