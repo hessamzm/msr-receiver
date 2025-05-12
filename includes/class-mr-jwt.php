@@ -8,7 +8,14 @@ class MR_JWT {
         return defined('MSR_JWT_SECRET') ? MSR_JWT_SECRET : 'your-very-secret-key';
     }
 
-    // تولید توکن (برای تست یا در آینده)
+    public static function build_site_jwt() {
+        $payload = [
+            'site_url' => get_site_url(),
+            'activated_at' => time()
+        ];
+        return self::generate_token($payload);
+    }
+
     public static function generate_token($payload, $exp_seconds = 3600) {
         $header = ['alg' => 'HS256', 'typ' => 'JWT'];
         $payload['exp'] = time() + $exp_seconds;
@@ -22,7 +29,6 @@ class MR_JWT {
         return "$base64UrlHeader.$base64UrlPayload.$base64UrlSignature";
     }
 
-    // اعتبارسنجی توکن
     public static function verify_token($token) {
         $parts = explode('.', $token);
         if (count($parts) !== 3) return false;
@@ -44,7 +50,6 @@ class MR_JWT {
         return $payload;
     }
 
-    // گرفتن توکن از Header
     public static function get_token_from_header() {
         $headers = getallheaders();
         if (!isset($headers['Authorization'])) return false;
@@ -56,7 +61,6 @@ class MR_JWT {
         return false;
     }
 
-    // بررسی توکن از هدر
     public static function authorize_request() {
         $token = self::get_token_from_header();
         if (!$token) return false;
@@ -65,7 +69,6 @@ class MR_JWT {
         return $payload;
     }
 
-    // تابع‌های encode/decode
     private static function base64url_encode($data) {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
@@ -77,28 +80,4 @@ class MR_JWT {
         }
         return base64_decode(strtr($data, '-_', '+/'));
     }
-}
-public static function build_site_jwt() {
-    $payload = [
-        'site_url' => get_site_url(),
-        'activated_at' => time()
-    ];
-    return self::generate_token($payload);
-}
-// ارسال JWT به سایت اصلی پس از نصب
-$jwt = MR_JWT::build_site_jwt();
-$response = wp_remote_post('https://web-coffee.ir/msr/jwt/resiver', [
-    'headers' => [
-        'Authorization' => 'Bearer ' . $jwt,
-        'Content-Type'  => 'application/json'
-    ],
-    'body' => json_encode([
-        'site_name' => get_bloginfo('name'),
-        'site_url' => get_site_url()
-    ]),
-    'timeout' => 10
-]);
-
-if (is_wp_error($response)) {
-    error_log('MSR JWT Registration failed: ' . $response->get_error_message());
 }

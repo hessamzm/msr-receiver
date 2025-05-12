@@ -1,0 +1,167 @@
+{
+  "info": {
+    "name": "MSR Report Receiver API",
+    "_postman_id": "msr-collection-001",
+    "description": "Postman collection for testing MSR Report Receiver endpoints with JWT authentication.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Report (Title + Content)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <jwt_token>",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"title\": \"عنوان تستی\", \"content\": \"<p>این یک محتوای تستی برای ارسال رپورتاژ است.</p>\"}"
+        },
+        "url": {
+          "raw": "https://your-target-site.com/wp-json/msr/v1/report"
+        }
+      }
+    },
+    {
+      "name": "Upload Featured Image",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <jwt_token>",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"image_url\": \"https://your-site.com/sample.jpg\"}"
+        },
+        "url": {
+          "raw": "https://your-target-site.com/wp-json/msr/v1/report/123/image"
+        }
+      }
+    },
+    {
+      "name": "Update Categories",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <jwt_token>",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"categories\": [\"اخبار\", \"اقتصادی\"]}"
+        },
+        "url": {
+          "raw": "https://your-target-site.com/wp-json/msr/v1/report/123/category"
+        }
+      }
+    },
+    {
+      "name": "Update Tags",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <jwt_token>",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"tags\": [\"رپورتاژ\", \"تبلیغات\", \"جدید\"]}"
+        },
+        "url": {
+          "raw": "https://your-target-site.com/wp-json/msr/v1/report/123/tags"
+        }
+      }
+    },
+    {
+      "name": "Update SEO Metadata",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <jwt_token>",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"focus_keyword\": \"رپورتاژ آگهی\", \"meta_description\": \"این رپورتاژ با هدف تبلیغات در سایت مقصد منتشر شده است.\", \"focus_synonyms\": \"خبر تبلیغاتی, خبر سفارشی\"}"
+        },
+        "url": {
+          "raw": "https://your-target-site.com/wp-json/msr/v1/report/123/seo"
+        }
+      }
+    },
+    {
+      "name": "Get Report Info",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <jwt_token>",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://your-target-site.com/wp-json/msr/v1/report/123"
+        }
+      }
+    },
+    {
+      "name": "Delete Report",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer <jwt_token>",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://your-target-site.com/wp-json/msr/v1/report/123"
+        }
+      }
+    }
+  ]
+}
