@@ -86,36 +86,85 @@ class MR_Endpoints {
         return ['post_id' => $post_id];
     }
 
-public static function update_image($request) {
-    $post_id = intval($request['id']);
-    $image_url = esc_url_raw($request->get_param('image_url'));
+public static function update_image( $request ) {
+    $post_id = intval( $request['id'] );
+    $image_url        = esc_url_raw( $request->get_param( 'image_url' ) );
+    $image_title      = sanitize_text_field( $request->get_param( 'image_title' ) );
+    $image_caption    = sanitize_text_field( $request->get_param( 'image_caption' ) );
+    $image_description = wp_kses_post( $request->get_param( 'image_description' ) );
+    $image_alt        = sanitize_text_field( $request->get_param( 'image_alt' ) );
 
-    if (!MR_Handler::post_exists_in_msr($post_id)) {
-        return new WP_Error('not_found', 'پست در جدول افزونه ثبت نشده است.', ['status' => 404]);
+    if ( ! MR_Handler::post_exists_in_msr( $post_id ) ) {
+        return new WP_Error( 'not_found', 'پست در جدول افزونه ثبت نشده است.', [ 'status' => 404 ] );
     }
 
-    if (!$image_url) return new WP_Error('no_image', 'آدرس تصویر ارسال نشده است.', ['status' => 400]);
+    if ( ! $image_url ) {
+        return new WP_Error( 'no_image', 'آدرس تصویر ارسال نشده است.', [ 'status' => 400 ] );
+    }
 
     require_once ABSPATH . 'wp-admin/includes/image.php';
     require_once ABSPATH . 'wp-admin/includes/file.php';
     require_once ABSPATH . 'wp-admin/includes/media.php';
 
-    $tmp = download_url($image_url);
-    if (is_wp_error($tmp)) return new WP_Error('download_error', 'دانلود تصویر با خطا مواجه شد.', ['status' => 500]);
+    // دانلود فایل
+    $tmp = download_url( $image_url );
+    if ( is_wp_error( $tmp ) ) {
+        return new WP_Error( 'download_error', 'دانلود تصویر با خطا مواجه شد.', [ 'status' => 500 ] );
+    }
 
     $file_array = [
-        'name'     => basename($image_url),
-        'tmp_name' => $tmp
+        'name'     => basename( $image_url ),
+        'tmp_name' => $tmp,
     ];
 
-    $attach_id = media_handle_sideload($file_array, $post_id);
-    if (is_wp_error($attach_id)) return new WP_Error('media_error', 'آپلود تصویر شکست خورد.', ['status' => 500]);
+    // آپلود به رسانه
+    $attach_id = media_handle_sideload( $file_array, $post_id );
+    if ( is_wp_error( $attach_id ) ) {
+        @unlink( $tmp );
+        return new WP_Error( 'media_error', 'آپلود تصویر شکست خورد.', [ 'status' => 500 ] );
+    }
 
-    set_post_thumbnail($post_id, $attach_id);
-    MR_Handler::add_log($post_id, 'تصویر شاخص افزوده شد');
+    // به‌روزرسانی متادیتای تصویر
+    // عنوان
+    if ( $image_title ) {
+        wp_update_post( [
+            'ID'         => $attach_id,
+            'post_title' => $image_title,
+        ] );
+    }
 
-    return ['message' => 'تصویر شاخص ثبت شد'];
+    // توضیح کوتاه (excerpt)
+    if ( $image_caption ) {
+        wp_update_post( [
+            'ID'           => $attach_id,
+            'post_excerpt' => $image_caption,
+        ] );
+    }
+
+    // توضیح کامل (content)
+    if ( $image_description ) {
+        wp_update_post( [
+            'ID'           => $attach_id,
+            'post_content' => $image_description,
+        ] );
+    }
+
+    // متن جایگزین
+    if ( $image_alt ) {
+        update_post_meta( $attach_id, '_wp_attachment_image_alt', $image_alt );
+    }
+
+    // تعیین به‌عنوان تصویر شاخص
+    set_post_thumbnail( $post_id, $attach_id );
+
+    MR_Handler::add_log( $post_id, 'تصویر شاخص و متا نوشته شدند' );
+
+    return [
+        'message'      => 'تصویر شاخص و متای آن با موفقیت ثبت شدند',
+        'attachment_id' => $attach_id,
+    ];
 }
+
 
     public static function update_category($request) {
     $post_id = intval($request['id']);

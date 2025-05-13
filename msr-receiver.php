@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MSR Report Receiver
  * Description: افزونه دریافت رپورتاژ خبری برای سایت مقصد با پشتیبانی از JWT.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Plugin URI: https://github.com/hessamzm/MSR-RECEIVER
  * Author: hessamzmz
  * Author URI: https://github.com/hessamzm/MSR-RECEIVER
