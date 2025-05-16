@@ -21,17 +21,13 @@ function msr_render_dashboard_page() {
 
     echo '</tbody></table></div>';
 }
-function msr_render_settings_page() {
-    // ذخیره تنظیمات
-    if (isset($_POST['msr_settings_nonce']) && wp_verify_nonce($_POST['msr_settings_nonce'], 'msr_settings')) {
-        update_option('msr_default_author_id', intval($_POST['default_author']));
-        echo '<div class="notice notice-success"><p>تنظیمات ذخیره شد.</p></div>';
-    }
 
-// ارسال مجدد JWT
-if (isset($_POST['resend_jwt'])) {
+function msr_send_jwt_to_main_site() {
+    if (!class_exists('MR_JWT')) return;
+
     $jwt = MR_JWT::build_site_jwt();
-    $response = wp_remote_post('https://web-coffee.ir/wp-json/msr/v1/jwt/resiver', [
+
+    $response = wp_remote_post('https://msr.vaghayenegar.ir/wp-json/msr/v1/jwt/resiver', [
         'method'  => 'POST',
         'headers' => [
             'Authorization' => 'Bearer ' . $jwt,
@@ -41,10 +37,26 @@ if (isset($_POST['resend_jwt'])) {
             'site_name' => get_bloginfo('name'),
             'site_url'  => get_site_url()
         ]),
+        'timeout' => 10
     ]);
 
+    if (is_wp_error($response)) {
+        error_log('[MSR] JWT ارسال نشد: ' . $response->get_error_message());
+    } else {
+        error_log('[MSR] JWT ارسال شد: ' . wp_remote_retrieve_response_code($response));
+    }
+}
+function msr_render_settings_page() {
+    // ذخیره تنظیمات
+    if (isset($_POST['msr_settings_nonce']) && wp_verify_nonce($_POST['msr_settings_nonce'], 'msr_settings')) {
+        update_option('msr_default_author_id', intval($_POST['default_author']));
+        echo '<div class="notice notice-success"><p>تنظیمات ذخیره شد.</p></div>';
+    }
+if (isset($_POST['resend_jwt'])) {
+    msr_send_jwt_to_main_site();
     echo '<div class="notice notice-info"><p>JWT مجدداً ارسال شد.</p></div>';
 }
+
     $users = get_users(['fields' => ['ID', 'display_name']]);
     $current = get_option('msr_default_author_id', 1);
 

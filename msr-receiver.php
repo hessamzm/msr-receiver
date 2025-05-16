@@ -22,6 +22,7 @@ require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-endpoints.php';
 require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-handler.php';
 require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-sql.php';
 require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-dashboard.php';
+require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-ads-widget.php';
 
 // اجرای API
 add_action('rest_api_init', ['MR_Endpoints', 'register_routes']);
