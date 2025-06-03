@@ -7,13 +7,18 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 global $wpdb;
 
 // حذف جدول اختصاصی افزونه
-$table_name = $wpdb->prefix . 'msr_reports';
-$wpdb->query("DROP TABLE IF EXISTS $table_name");
+$tables = [
+    $wpdb->prefix . 'msr_reports',
+    $wpdb->prefix . 'msr_ads_vaghaye',
+    $wpdb->prefix . 'msr_backlinks'
+];
 
-// در صورت نیاز: حذف گزینه‌هایی که ذخیره کرده‌ایم
-// delete_option('msr_jwt_secret'); // اگر کلیدی در option ذخیره کرده‌ای
+foreach ($tables as $table) {
+    $wpdb->query("DROP TABLE IF EXISTS $table");
+}
 
-// در صورت نیاز: حذف فایل‌های موقتی یا داده‌های دیگر
+// حذف گزینه‌های ذخیره‌شده (در صورت نیاز)
+delete_option('msr_jwt_secret'); // اگر کلیدی در option ذخیره کرده‌ای
 
-// لاگ‌نویسی اختیاری (در صورت توسعه بیشتر)
+// لاگ‌نویسی اختیاری
 error_log('MSR Receiver Plugin uninstalled and cleaned up.');
