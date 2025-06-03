@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MSR Report Receiver
  * Description: افزونه دریافت رپورتاژ خبری برای سایت مقصد با پشتیبانی از JWT.
- * Version: 1.0.1
+ * Version: 2.0.1
  * Plugin URI: https://github.com/hessamzm/MSR-RECEIVER
  * Author: hessamzmz
  * Author URI: https://github.com/hessamzm/MSR-RECEIVER
@@ -23,9 +23,14 @@ require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-handler.php';
 require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-sql.php';
 require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-dashboard.php';
 require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-ads-widget.php';
+require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-msr-ads-api.php';
+require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-backlink.php';
+require_once MSR_RECEIVER_PLUGIN_DIR . 'includes/class-mr-backlink-witget.php';
 
 // اجرای API
 add_action('rest_api_init', ['MR_Endpoints', 'register_routes']);
+add_action('rest_api_init', ['MSR_Backlink_API', 'init']);
+
 
 add_action('admin_menu', 'msr_register_admin_menu');
 function msr_register_admin_menu() {

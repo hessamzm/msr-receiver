@@ -53,6 +53,19 @@ class MR_Endpoints {
             'callback' => [__CLASS__, 'delete_report'],
             'permission_callback' => [__CLASS__, 'check_auth']
         ]);
+        // مسیر ویرایش عنوان و محتوا
+register_rest_route('msr/v1', '/report/(?P<id>\d+)', [
+    'methods'  => 'PUT',
+    'callback' => [__CLASS__, 'update_report'],
+    'permission_callback' => [__CLASS__, 'check_auth']
+]);
+
+// مسیر زمان‌بندی انتشار
+register_rest_route('msr/v1', '/report/(?P<id>\d+)/schedule', [
+    'methods'  => 'PUT',
+    'callback' => [__CLASS__, 'update_schedule'],
+    'permission_callback' => [__CLASS__, 'check_auth']
+]);
     }
 
     public static function check_auth() {
@@ -258,4 +271,69 @@ public static function update_seo($request) {
 
         return ['message' => 'پست حذف شد'];
     }
+    public static function update_schedule($request) {
+    $post_id = intval($request['id']);
+
+    if (!MR_Handler::post_exists_in_msr($post_id)) {
+        return new WP_Error('not_found', 'پست در جدول افزونه ثبت نشده است.', ['status' => 404]);
+    }
+
+    $datetime = $request->get_param('publish_datetime');
+    if (!$datetime) {
+        return new WP_Error('invalid_datetime', 'تاریخ و زمان انتشار ارسال نشده است.', ['status' => 400]);
+    }
+
+    $timestamp = strtotime($datetime);
+    if ($timestamp === false) {
+        return new WP_Error('invalid_datetime', 'فرمت تاریخ و زمان معتبر نیست.', ['status' => 400]);
+    }
+
+    $post_status = (time() > $timestamp) ? 'publish' : 'future';
+
+    $result = wp_update_post([
+        'ID' => $post_id,
+        'post_date' => date('Y-m-d H:i:s', $timestamp),
+        'post_date_gmt' => gmdate('Y-m-d H:i:s', $timestamp),
+        'post_status' => $post_status,
+    ], true);
+
+    if (is_wp_error($result)) {
+        return new WP_Error('update_failed', 'خطا در به‌روزرسانی زمان انتشار پست.', ['status' => 500]);
+    }
+
+    MR_Handler::add_log($post_id, 'زمان‌بندی انتشار پست بروزرسانی شد');
+
+    return ['message' => 'زمان‌بندی انتشار پست با موفقیت به‌روزرسانی شد'];
+}
+public static function update_report($request) {
+    $post_id = intval($request['id']);
+
+    if (!MR_Handler::post_exists_in_msr($post_id)) {
+        return new WP_Error('not_found', 'پست در جدول افزونه ثبت نشده است.', ['status' => 404]);
+    }
+
+    $title = sanitize_text_field($request->get_param('title'));
+    $content = wp_kses_post($request->get_param('content'));
+
+    $update_data = ['ID' => $post_id];
+
+    if ($title !== null) {
+        $update_data['post_title'] = $title;
+    }
+
+    if ($content !== null) {
+        $update_data['post_content'] = $content;
+    }
+
+    $result = wp_update_post($update_data, true);
+
+    if (is_wp_error($result)) {
+        return new WP_Error('update_failed', 'خطا در به‌روزرسانی پست.', ['status' => 500]);
+    }
+
+    MR_Handler::add_log($post_id, 'عنوان و محتوای پست ویرایش شد');
+
+    return ['message' => 'عنوان و محتوای پست با موفقیت به‌روزرسانی شدند'];
+}
+
 }
