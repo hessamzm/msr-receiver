@@ -52,7 +52,6 @@ function msr_create_database_table() {
 }
 
 // حذف جداول هنگام حذف افزونه
-register_uninstall_hook(__FILE__, 'msr_remove_database_table');
 function msr_remove_database_table() {
     global $wpdb;
     $table1 = $wpdb->prefix . 'msr_reports';
@@ -63,3 +62,6 @@ function msr_remove_database_table() {
     $wpdb->query("DROP TABLE IF EXISTS $table2");
     $wpdb->query("DROP TABLE IF EXISTS $table3");
 }
+
+// ثبت هوک حذف افزونه
+register_uninstall_hook(__FILE__, 'msr_remove_database_table');
