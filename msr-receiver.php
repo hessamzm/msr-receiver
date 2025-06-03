@@ -1,7 +1,11 @@
 <?php
 /**
  * Plugin Name: MSR Report Receiver
- * Description: افزونه دریافت رپورتاژ خبری برای سایت مقصد با پشتیبانی از JWT.
+ * Description: دریافت رپورتاژ - تبلیغات - بک لینک با پشتیبانی jwt برای دریافت اطلاعات از بانک‌های امنیتی
+ * Requires at least: 6.1.0
+ * Requires PHP: 7.4.0
+ * Tested up to: 6.1.0
+ * Stable tag: 1.0.0
  * Version: 2.0.1
  * Plugin URI: https://github.com/hessamzm/MSR-RECEIVER
  * Author: hessamzmz
