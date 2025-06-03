@@ -63,6 +63,3 @@ function msr_remove_database_table() {
     $wpdb->query("DROP TABLE IF EXISTS $table2");
     $wpdb->query("DROP TABLE IF EXISTS $table3");
 }
-
-// ثبت هوک حذف افزونه
-register_uninstall_hook(__FILE__, 'msr_remove_database_table');
